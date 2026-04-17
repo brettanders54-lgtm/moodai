@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(supabase --version)",
+      "Bash(npx supabase:*)",
+      "Bash(git init:*)",
+      "Bash(git remote:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

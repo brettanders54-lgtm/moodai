@@ -1,32 +1,29 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  MessageSquare, 
-  ArrowLeft, 
-  Filter, 
+import {
+  MessageSquare,
+  Filter,
   CheckCircle2,
   Clock,
   AlertCircle,
   Lightbulb,
   Star,
   Eye,
-  Trash2,
   MoreVertical
 } from "lucide-react";
 import { format } from "date-fns";
 import { az } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import obaLogo from "@/assets/oba-logo.jpg";
+import { AppLayout } from "@/components/AppLayout";
 
 interface Suggestion {
   id: string;
@@ -55,7 +52,6 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 };
 
 const SuggestionsManagement = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedSuggestion, setSelectedSuggestion] = useState<Suggestion | null>(null);
@@ -78,8 +74,8 @@ const SuggestionsManagement = () => {
     mutationFn: async ({ id, status, notes }: { id: string; status: string; notes?: string }) => {
       const { error } = await supabase
         .from("anonymous_suggestions")
-        .update({ 
-          status, 
+        .update({
+          status,
           admin_notes: notes,
           reviewed_at: new Date().toISOString(),
         })
@@ -93,8 +89,8 @@ const SuggestionsManagement = () => {
     },
   });
 
-  const filteredSuggestions = filter === "all" 
-    ? suggestions 
+  const filteredSuggestions = filter === "all"
+    ? suggestions
     : suggestions.filter(s => s.status === filter);
 
   const stats = {
@@ -115,44 +111,15 @@ const SuggestionsManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      {/* Background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-violet-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl" />
-      </div>
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/70 backdrop-blur-xl border-b border-border/50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate("/hr-panel")}
-                className="rounded-xl"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-lg">
-                <span className="text-2xl">😊</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-violet-500" />
-                  Təkliflər İdarəetməsi
-                </h1>
-                <p className="text-sm text-muted-foreground">Anonim təklif və şikayətlər</p>
-              </div>
-            </div>
-          </div>
+    <AppLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Təkliflərin İdarə Edilməsi</h1>
+          <p className="text-muted-foreground">Anonim təklif və şikayətlər</p>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Stats */}
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -163,7 +130,7 @@ const SuggestionsManagement = () => {
             { label: "Yeni", value: stats.new, color: "from-blue-500 to-cyan-500", icon: Clock },
             { label: "Baxılır", value: stats.reviewing, color: "from-amber-500 to-yellow-500", icon: Eye },
             { label: "Həll edilib", value: stats.resolved, color: "from-emerald-500 to-green-500", icon: CheckCircle2 },
-          ].map((stat, i) => (
+          ].map((stat) => (
             <motion.div key={stat.label} variants={itemVariants}>
               <Card className="border-border/50 hover:shadow-lg transition-shadow">
                 <CardContent className="p-4 flex items-center gap-4">
@@ -299,8 +266,8 @@ const SuggestionsManagement = () => {
                                   <div className="flex gap-2">
                                     <Button
                                       variant="outline"
-                                      onClick={() => updateMutation.mutate({ 
-                                        id: suggestion.id, 
+                                      onClick={() => updateMutation.mutate({
+                                        id: suggestion.id,
                                         status: "reviewing",
                                         notes: adminNotes
                                       })}
@@ -309,8 +276,8 @@ const SuggestionsManagement = () => {
                                       Baxılır
                                     </Button>
                                     <Button
-                                      onClick={() => updateMutation.mutate({ 
-                                        id: suggestion.id, 
+                                      onClick={() => updateMutation.mutate({
+                                        id: suggestion.id,
                                         status: "resolved",
                                         notes: adminNotes
                                       })}
@@ -332,8 +299,8 @@ const SuggestionsManagement = () => {
             )}
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 

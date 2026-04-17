@@ -61,7 +61,7 @@ const mainNavItems: NavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
   { label: "Şəxsi Heyət", icon: Users, href: "/employee-responses" },
   { label: "Analitika", icon: BarChart3, href: "/analytics" },
-  { label: "AI Analiz", icon: Sparkles, href: "/ai-analysis", badge: "Yeni" },
+  { label: "AI Analiz", icon: Sparkles, href: "/analytics", badge: "Yeni" },
 ];
 
 const managementNavItems: NavItem[] = [

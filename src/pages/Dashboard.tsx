@@ -186,7 +186,7 @@ export default function DashboardNew() {
               <RefreshCw className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")} />
               Yenilə
             </Button>
-            <Button size="sm" className="gradient-primary">
+            <Button size="sm" className="gradient-primary" onClick={() => navigate("/analytics")}>
               <Activity className="h-4 w-4 mr-2" />
               AI Analiz
             </Button>

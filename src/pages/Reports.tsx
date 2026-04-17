@@ -1,15 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { format, subDays, subMonths } from "date-fns";
 import { az } from "date-fns/locale";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  ArrowLeft, 
-  Download, 
-  FileText, 
-  Calendar, 
-  TrendingUp, 
+import {
+  Download,
+  FileText,
+  TrendingUp,
   TrendingDown,
   Users,
   Building2,
@@ -19,24 +16,20 @@ import {
   Activity,
   FileSpreadsheet,
   Printer,
-  Mail,
   Sparkles,
   CheckCircle2,
-  Clock,
-  Filter,
   FileDown
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { exportToExcel, exportToPDF, formatReportData } from "@/lib/exportUtils";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { AppLayout } from "@/components/AppLayout";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -52,7 +45,6 @@ const itemVariants = {
 };
 
 const Reports = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState("month");
   const [selectedBranch, setSelectedBranch] = useState("all");
@@ -121,21 +113,21 @@ const Reports = () => {
   });
 
   // Calculate statistics
-  const filteredResponses = selectedBranch === "all" 
-    ? responses 
+  const filteredResponses = selectedBranch === "all"
+    ? responses
     : responses.filter(r => r.branch === selectedBranch);
 
   const totalResponses = filteredResponses.length;
   const uniqueEmployees = [...new Set(filteredResponses.map(r => r.employee_code))].length;
-  
+
   const moodCounts = {
     'Yaxşı': filteredResponses.filter(r => r.mood === 'Yaxşı').length,
     'Normal': filteredResponses.filter(r => r.mood === 'Normal').length,
     'Pis': filteredResponses.filter(r => r.mood === 'Pis').length,
   };
 
-  const satisfactionRate = totalResponses > 0 
-    ? Math.round((moodCounts['Yaxşı'] / totalResponses) * 100) 
+  const satisfactionRate = totalResponses > 0
+    ? Math.round((moodCounts['Yaxşı'] / totalResponses) * 100)
     : 0;
 
   const criticalAlerts = burnoutAlerts.filter(a => a.risk_score >= 80).length;
@@ -149,7 +141,7 @@ const Reports = () => {
     const branchGood = branchResponses.filter(r => r.mood === 'Yaxşı').length;
     const branchBad = branchResponses.filter(r => r.mood === 'Pis').length;
     const branchAlerts = burnoutAlerts.filter(a => a.branch === branch).length;
-    
+
     return {
       branch,
       totalResponses: branchTotal,
@@ -165,7 +157,7 @@ const Reports = () => {
     const deptTotal = deptResponses.length;
     const deptGood = deptResponses.filter(r => r.mood === 'Yaxşı').length;
     const deptBad = deptResponses.filter(r => r.mood === 'Pis').length;
-    
+
     return {
       department,
       totalResponses: deptTotal,
@@ -248,7 +240,7 @@ const Reports = () => {
         },
         {
           title: "Əsas Şikayət Səbəbləri",
-          content: topReasons.length > 0 
+          content: topReasons.length > 0
             ? `<table><tr><th>Səbəb</th><th>Say</th><th>Faiz</th></tr>${topReasons.map(r => `<tr><td>${r.reason}</td><td>${r.count}</td><td>${r.percentage}%</td></tr>`).join("")}</table>`
             : "<p>Şikayət qeyd edilməyib</p>"
         },
@@ -316,52 +308,19 @@ const Reports = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <motion.div 
-          className="absolute top-20 -left-32 w-96 h-96 bg-gradient-to-r from-primary/10 to-violet-500/10 rounded-full blur-3xl"
-          animate={{ x: [0, 50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute bottom-20 -right-32 w-96 h-96 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 rounded-full blur-3xl"
-          animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1, 1.2, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-4">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => navigate("/hr-panel")}
-                className="rounded-xl hover:bg-primary/10"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </motion.div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
-                  Hesabatlar
-                </h1>
-                <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {format(dateRange.from, "d MMM", { locale: az })} - {format(dateRange.to, "d MMM yyyy", { locale: az })}
-              </p>
-            </div>
+    <AppLayout>
+      <div className="space-y-6">
+        {/* Header with filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Hesabatlar</h1>
+            <p className="text-muted-foreground">
+              {format(dateRange.from, "d MMM", { locale: az })} - {format(dateRange.to, "d MMM yyyy", { locale: az })}
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
+          <div className="flex flex-wrap items-center gap-2">
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="w-[130px] rounded-xl border-primary/20">
-                <Clock className="h-4 w-4 mr-2 text-primary" />
+              <SelectTrigger className="w-[130px] rounded-xl">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -371,55 +330,21 @@ const Reports = () => {
                 <SelectItem value="year">İllik</SelectItem>
               </SelectContent>
             </Select>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleExportCSV}
-                className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2"
-              >
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">CSV</span>
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleExportExcel}
-                className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2"
-              >
-                <FileSpreadsheet className="h-4 w-4" />
-                <span className="hidden sm:inline">Excel</span>
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                variant="default" 
-                size="sm" 
-                onClick={handleExportPDF}
-                className="rounded-xl gap-2 bg-gradient-to-r from-primary to-primary/80"
-              >
-                <FileDown className="h-4 w-4" />
-                <span className="hidden sm:inline">PDF</span>
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handlePrint}
-                className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2"
-              >
-                <Printer className="h-4 w-4" />
-                <span className="hidden sm:inline">Çap</span>
-              </Button>
-            </motion.div>
+            <Button variant="outline" size="sm" onClick={handleExportCSV} className="rounded-xl gap-2">
+              <Download className="h-4 w-4" />
+              CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="rounded-xl gap-2">
+              <FileSpreadsheet className="h-4 w-4" />
+              Excel
+            </Button>
+            <Button variant="default" size="sm" onClick={handleExportPDF} className="rounded-xl gap-2 gradient-primary">
+              <FileDown className="h-4 w-4" />
+              PDF
+            </Button>
           </div>
         </div>
-      </header>
 
-      <main className="container py-6 space-y-6 relative z-10">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -436,7 +361,7 @@ const Reports = () => {
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -4, scale: 1.02 }}
               >
-                <Card className={`relative overflow-hidden border-0 shadow-lg ${card.bgGlow} backdrop-blur-sm ${card.isAlert ? 'ring-2 ring-rose-500/30' : ''}`}>
+                <Card className={`relative overflow-hidden border-0 shadow-lg ${card.bgGlow} ${card.isAlert ? 'ring-2 ring-rose-500/30' : ''}`}>
                   <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${card.gradient}`} />
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
@@ -460,7 +385,7 @@ const Reports = () => {
           {/* Tabs for different reports */}
           <motion.div variants={itemVariants}>
             <Tabs defaultValue="overview" className="space-y-4">
-              <TabsList className="bg-muted/50 backdrop-blur-sm p-1 rounded-xl">
+              <TabsList className="bg-muted/50 p-1 rounded-xl">
                 <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md">
                   <BarChart3 className="h-4 w-4 mr-2" />
                   İcmal
@@ -498,7 +423,7 @@ const Reports = () => {
                         { label: "Normal", count: moodCounts['Normal'], color: "bg-amber-500", percentage: totalResponses > 0 ? (moodCounts['Normal'] / totalResponses) * 100 : 0 },
                         { label: "Pis", count: moodCounts['Pis'], color: "bg-rose-500", percentage: totalResponses > 0 ? (moodCounts['Pis'] / totalResponses) * 100 : 0 },
                       ].map((mood, index) => (
-                        <motion.div 
+                        <motion.div
                           key={mood.label}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -510,7 +435,7 @@ const Reports = () => {
                             <span className="text-muted-foreground">{mood.count} ({Math.round(mood.percentage)}%)</span>
                           </div>
                           <div className="h-2 rounded-full bg-muted overflow-hidden">
-                            <motion.div 
+                            <motion.div
                               className={`h-full rounded-full ${mood.color}`}
                               initial={{ width: 0 }}
                               animate={{ width: `${mood.percentage}%` }}
@@ -539,7 +464,7 @@ const Reports = () => {
                         { label: "Gözləyən", count: managerActions.filter(a => a.status === 'pending').length, color: "bg-blue-500" },
                         { label: "Ləğv edilmiş", count: managerActions.filter(a => a.status === 'cancelled').length, color: "bg-gray-500" },
                       ].map((status, index) => (
-                        <motion.div 
+                        <motion.div
                           key={status.label}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -582,14 +507,8 @@ const Reports = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {branchStats.map((stat, index) => (
-                          <motion.tr
-                            key={stat.branch}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="hover:bg-muted/50"
-                          >
+                        {branchStats.map((stat) => (
+                          <TableRow key={stat.branch} className="hover:bg-muted/50">
                             <TableCell className="font-medium">{stat.branch}</TableCell>
                             <TableCell className="text-center">{stat.totalResponses}</TableCell>
                             <TableCell className="text-center">
@@ -611,7 +530,7 @@ const Reports = () => {
                                 <span className="text-muted-foreground">-</span>
                               )}
                             </TableCell>
-                          </motion.tr>
+                          </TableRow>
                         ))}
                       </TableBody>
                     </Table>
@@ -640,14 +559,8 @@ const Reports = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {departmentStats.map((stat, index) => (
-                          <motion.tr
-                            key={stat.department}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="hover:bg-muted/50"
-                          >
+                        {departmentStats.map((stat) => (
+                          <TableRow key={stat.department} className="hover:bg-muted/50">
                             <TableCell className="font-medium">{stat.department}</TableCell>
                             <TableCell className="text-center">{stat.totalResponses}</TableCell>
                             <TableCell className="text-center">
@@ -660,7 +573,7 @@ const Reports = () => {
                                 {stat.dissatisfactionRate}%
                               </Badge>
                             </TableCell>
-                          </motion.tr>
+                          </TableRow>
                         ))}
                       </TableBody>
                     </Table>
@@ -682,7 +595,7 @@ const Reports = () => {
                   <CardContent className="space-y-4">
                     {topReasons.length > 0 ? (
                       topReasons.map((reason, index) => (
-                        <motion.div 
+                        <motion.div
                           key={reason.reason}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -694,7 +607,7 @@ const Reports = () => {
                             <span className="text-muted-foreground">{reason.count} ({reason.percentage}%)</span>
                           </div>
                           <div className="h-2 rounded-full bg-muted overflow-hidden">
-                            <motion.div 
+                            <motion.div
                               className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
                               initial={{ width: 0 }}
                               animate={{ width: `${reason.percentage}%` }}
@@ -714,8 +627,8 @@ const Reports = () => {
             </Tabs>
           </motion.div>
         </motion.div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 

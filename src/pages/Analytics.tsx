@@ -82,6 +82,12 @@ export default function AnalyticsNew() {
   // AI Analysis mutation
   const analyzeMutation = useMutation({
     mutationFn: async () => {
+      // Fetch burnout alerts inside mutation to ensure we have the data
+      const { data: burnoutData } = await supabase
+        .from("burnout_alerts")
+        .select("*")
+        .eq("is_resolved", false);
+
       // Get mood distribution
       const moodDistribution = analytics.moodCountsArray;
       const topReasons = analytics.topReasons;
@@ -99,16 +105,17 @@ export default function AnalyticsNew() {
           department: r.department,
         }));
 
+      const { data: session } = await supabase.auth.getSession();
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-responses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          Authorization: `Bearer ${session?.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
           moodDistribution,
           topReasons,
-          riskCount: burnoutAlerts?.length || 0,
+          riskCount: burnoutData?.length || 0,
           responseRate: analytics.responseRate,
           overallIndex: analytics.satisfactionIndex,
           criticalComplaints,

@@ -1,10 +1,10 @@
 project_id = "mzowwggiqvosvdyvlgpo"
 
 [functions.analyze-responses]
-verify_jwt = true
+verify_jwt = false
 
 [functions.predict-risk]
-verify_jwt = true
+verify_jwt = false
 
 [functions.translate-content]
 verify_jwt = false

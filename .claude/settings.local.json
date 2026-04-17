@@ -13,7 +13,10 @@
       "Bash(git push:*)",
       "Bash(supabase projects:*)",
       "Bash(cp supabase/migrations/*.sql supabase/migrations/backup/)",
-      "Bash(rm supabase/migrations/*.sql)"
+      "Bash(rm supabase/migrations/*.sql)",
+      "Bash(curl:*)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(node:*)"
     ]
   }
 }

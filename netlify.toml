@@ -1,0 +1,42 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://api.minimax.io"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["supabase/functions/**"]
+
+# Production environment
+[context.production]
+  environment = { NETLIFY = "true", NODE_ENV = "production" }
+
+# Deploy Preview for PRs
+[context.deploy-preview]
+  environment = { NODE_ENV = "production" }
+
+# Branch deploys
+[context.branch-deploy]
+  environment = { NODE_ENV = "staging" }
+
+# Go true for all operations, false to skip caching for an individual operation.
+[buildtool]
+  [buildtool.npm]
+    enabled = true
